@@ -1,4 +1,3 @@
-import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_charts/flutter_charts.dart';
 
@@ -59,7 +58,7 @@ class _SummaryTabState extends State<SummaryTab> {
                 top: 24,
                 bottom: 12
             ),
-                child: Text("Mês: 04/2024", style: Theme.of(context).textTheme.headlineLarge,)),
+                child: Text("Resumo: 04/2024", style: Theme.of(context).textTheme.headlineLarge,)),
             Padding(padding: const EdgeInsets.only(
                 left: 12,
                 right: 12,
