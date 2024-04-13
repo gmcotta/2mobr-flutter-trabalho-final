@@ -85,7 +85,7 @@ class _$AppDatabase extends AppDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `BudgetItem` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `type` TEXT NOT NULL, `category` TEXT, `description` TEXT NOT NULL, `date` TEXT NOT NULL, `amount` TEXT NOT NULL, `isPaidWithCreditCard` INTEGER NOT NULL)');
+            'CREATE TABLE IF NOT EXISTS `BudgetItem` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `type` TEXT NOT NULL, `category` TEXT, `description` TEXT NOT NULL, `date` TEXT NOT NULL, `month` INTEGER NOT NULL, `year` INTEGER NOT NULL, `amount` TEXT NOT NULL, `isPaidWithCreditCard` INTEGER NOT NULL)');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -113,6 +113,8 @@ class _$BudgetItemDao extends BudgetItemDao {
                   'category': item.category,
                   'description': item.description,
                   'date': item.date,
+                  'month': item.month,
+                  'year': item.year,
                   'amount': item.amount,
                   'isPaidWithCreditCard': item.isPaidWithCreditCard ? 1 : 0
                 }),
@@ -126,6 +128,8 @@ class _$BudgetItemDao extends BudgetItemDao {
                   'category': item.category,
                   'description': item.description,
                   'date': item.date,
+                  'month': item.month,
+                  'year': item.year,
                   'amount': item.amount,
                   'isPaidWithCreditCard': item.isPaidWithCreditCard ? 1 : 0
                 }),
@@ -139,6 +143,8 @@ class _$BudgetItemDao extends BudgetItemDao {
                   'category': item.category,
                   'description': item.description,
                   'date': item.date,
+                  'month': item.month,
+                  'year': item.year,
                   'amount': item.amount,
                   'isPaidWithCreditCard': item.isPaidWithCreditCard ? 1 : 0
                 });
@@ -164,6 +170,8 @@ class _$BudgetItemDao extends BudgetItemDao {
             category: row['category'] as String?,
             description: row['description'] as String,
             date: row['date'] as String,
+            month: row['month'] as int,
+            year: row['year'] as int,
             amount: row['amount'] as String,
             isPaidWithCreditCard: (row['isPaidWithCreditCard'] as int) != 0));
   }
@@ -177,6 +185,8 @@ class _$BudgetItemDao extends BudgetItemDao {
             category: row['category'] as String?,
             description: row['description'] as String,
             date: row['date'] as String,
+            month: row['month'] as int,
+            year: row['year'] as int,
             amount: row['amount'] as String,
             isPaidWithCreditCard: (row['isPaidWithCreditCard'] as int) != 0),
         arguments: [id]);

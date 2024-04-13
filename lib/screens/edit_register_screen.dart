@@ -23,6 +23,8 @@ class _EditRegisterScreenState extends State<EditRegisterScreen> {
     print(_formKey.currentState?.value);
     String category = _formKey.currentState?.fields['category']?.value ?? '';
     String date = (_formKey.currentState?.fields['date']?.value as DateTime).toString();
+    int month = (_formKey.currentState?.fields['date']?.value as DateTime).month;
+    int year = (_formKey.currentState?.fields['date']?.value as DateTime).year;
 
     final budgetItem = BudgetItem(
         id: widget.budgetItem.id,
@@ -30,6 +32,8 @@ class _EditRegisterScreenState extends State<EditRegisterScreen> {
         category: category,
         description: _formKey.currentState?.fields['description']?.value,
         date: date,
+        month: month,
+        year: year,
         amount: _formKey.currentState?.fields['amount']?.value,
         isPaidWithCreditCard: _formKey.currentState?.fields['isPaidWithCreditCard']?.value);
 

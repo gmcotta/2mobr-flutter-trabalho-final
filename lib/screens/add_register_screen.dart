@@ -20,12 +20,16 @@ class _AddRegisterScreenState extends State<AddRegisterScreen> {
   void _saveBudgetItem() async {
     String category = _formKey.currentState?.fields['category']?.value ?? '';
     String date = (_formKey.currentState?.fields['date']?.value as DateTime).toString();
+    int month = (_formKey.currentState?.fields['date']?.value as DateTime).month;
+    int year = (_formKey.currentState?.fields['date']?.value as DateTime).year;
 
     final budgetItem = BudgetItem(
         type: _formKey.currentState?.fields['type']?.value,
         category: category,
         description: _formKey.currentState?.fields['description']?.value,
         date: date,
+        month: month,
+        year: year,
         amount: _formKey.currentState?.fields['amount']?.value,
         isPaidWithCreditCard: _formKey.currentState?.fields['isPaidWithCreditCard']?.value);
 

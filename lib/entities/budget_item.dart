@@ -9,6 +9,8 @@ class BudgetItem {
   final String? category;
   final String description;
   final String date;
+  final int month;
+  final int year;
   final String amount;
   final bool isPaidWithCreditCard;
 
@@ -18,6 +20,8 @@ class BudgetItem {
     required this.category,
     required this.description,
     required this.date,
+    required this.month,
+    required this.year,
     required this.amount,
     required this.isPaidWithCreditCard
   });
@@ -29,6 +33,8 @@ class BudgetItem {
       'category': category,
       'description': description,
       'date': date,
+      'month': month,
+      'year': year,
       'amount': amount,
       'isPaidWithCreditCard': isPaidWithCreditCard
     };
