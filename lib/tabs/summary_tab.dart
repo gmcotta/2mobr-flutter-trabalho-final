@@ -44,78 +44,76 @@ class _SummaryTabState extends State<SummaryTab> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      child: Container(
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height,
-        color: Colors.white,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            Padding(padding: const EdgeInsets.only(
-                left: 12,
-                right: 12,
-                top: 24,
-                bottom: 12
+        child: Container(
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height,
+      color: Colors.white,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          Padding(
+              padding: const EdgeInsets.only(
+                  left: 12, right: 12, top: 24, bottom: 12),
+              child: Text(
+                "Resumo: 04/2024",
+                style: Theme.of(context).textTheme.headlineLarge,
+              )),
+          Padding(
+              padding: const EdgeInsets.only(
+                  left: 12, right: 12, top: 12, bottom: 12),
+              child: Text(
+                "Receitas: R\$4500,00",
+                style: Theme.of(context).textTheme.titleLarge,
+              )),
+          Padding(
+              padding: const EdgeInsets.only(
+                  left: 12, right: 12, top: 12, bottom: 12),
+              child: Text(
+                "Despesas: R\$4000,00",
+                style: Theme.of(context).textTheme.titleLarge,
+              )),
+          Padding(
+              padding: const EdgeInsets.only(
+                  left: 12, right: 12, top: 12, bottom: 12),
+              child: Text(
+                "Saldo: R\$500,00",
+                style: Theme.of(context).textTheme.titleLarge,
+              )),
+          Padding(
+              padding: const EdgeInsets.only(
+                  left: 12, right: 12, top: 48, bottom: 12),
+              child: Text(
+                "Principal despesa",
+                style: Theme.of(context).textTheme.titleLarge,
+              )),
+          Padding(
+              padding: const EdgeInsets.only(
+                  left: 12, right: 12, top: 12, bottom: 12),
+              child: Text(
+                "Aluguel - R\$ 2000,00",
+                style: Theme.of(context).textTheme.titleMedium,
+              )),
+          Padding(
+              padding: const EdgeInsets.only(
+                  left: 12, right: 12, top: 48, bottom: 12),
+              child: Text(
+                "Evolução - 2024",
+                style: Theme.of(context).textTheme.titleLarge,
+              )),
+          Expanded(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  // #### Core chart
+                  child: chartToRun(), // verticalBarChart, lineChart
+                ),
+              ],
             ),
-                child: Text("Resumo: 04/2024", style: Theme.of(context).textTheme.headlineLarge,)),
-            Padding(padding: const EdgeInsets.only(
-                left: 12,
-                right: 12,
-                top: 12,
-                bottom: 12
-            ),
-                child: Text("Receitas: R\$4500,00", style: Theme.of(context).textTheme.titleLarge,)),
-            Padding(padding: const EdgeInsets.only(
-                left: 12,
-                right: 12,
-                top: 12,
-                bottom: 12
-            ),
-                child: Text("Despesas: R\$4000,00", style: Theme.of(context).textTheme.titleLarge,)),
-            Padding(padding: const EdgeInsets.only(
-                left: 12,
-                right: 12,
-                top: 12,
-                bottom: 12
-            ),
-                child: Text("Saldo: R\$500,00", style: Theme.of(context).textTheme.titleLarge,)),
-            Padding(padding: const EdgeInsets.only(
-                left: 12,
-                right: 12,
-                top: 48,
-                bottom: 12
-            ),
-                child: Text("Principal despesa", style: Theme.of(context).textTheme.titleLarge,)),
-            Padding(padding: const EdgeInsets.only(
-                left: 12,
-                right: 12,
-                top: 12,
-                bottom: 12
-            ),
-                child: Text("Aluguel - R\$ 2000,00", style: Theme.of(context).textTheme.titleMedium,)),
-            Padding(padding: const EdgeInsets.only(
-                left: 12,
-                right: 12,
-                top: 48,
-                bottom: 12
-            ),
-                child: Text("Evolução - 2024", style: Theme.of(context).textTheme.titleLarge,)),
-            Expanded(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Expanded(
-                    // #### Core chart
-                    child: chartToRun(), // verticalBarChart, lineChart
-                  ),
-                ],
-              ),
-            ),
-
-          ],
-        ),
-      )
-    );
+          ),
+        ],
+      ),
+    ));
   }
 }

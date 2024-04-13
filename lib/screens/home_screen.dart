@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'package:trabalho_final_2mobr/tabs/budget_tab.dart';
 import 'package:trabalho_final_2mobr/tabs/summary_tab.dart';
 
@@ -19,10 +20,7 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: const Text('Planejador financeiro'),
       ),
-      body: [
-        summaryTab,
-        budgetTab
-      ][currentPageIndex],
+      body: [budgetTab,summaryTab][currentPageIndex],
       bottomNavigationBar: NavigationBar(
         onDestinationSelected: (int index) {
           setState(() {
@@ -32,17 +30,15 @@ class _HomeScreenState extends State<HomeScreen> {
         selectedIndex: currentPageIndex,
         destinations: const <Widget>[
           NavigationDestination(
-            icon: Icon(Icons.today,),
-            label: 'Resumo',
-          ),
+              icon: Icon(Icons.account_balance), label: 'Orçamento'),
           NavigationDestination(
-              icon: Icon(Icons.account_balance),
-              label: 'Orçamento'
+            icon: Icon(
+              Icons.summarize,
+            ),
+            label: 'Resumo',
           ),
         ],
       ),
-
     );
   }
-
 }

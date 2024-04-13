@@ -1,14 +1,15 @@
+import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:intl/intl.dart';
+
 import 'package:trabalho_final_2mobr/database/app_database.dart';
 import 'package:trabalho_final_2mobr/entities/budget_item.dart';
 
 class EditRegisterScreen extends StatefulWidget {
   final BudgetItem budgetItem;
 
-  const EditRegisterScreen({super.key, required this.budgetItem });
+  const EditRegisterScreen({super.key, required this.budgetItem});
 
   @override
   State<EditRegisterScreen> createState() => _EditRegisterScreenState();
@@ -22,8 +23,10 @@ class _EditRegisterScreenState extends State<EditRegisterScreen> {
   void _updateBudgetItem() async {
     print(_formKey.currentState?.value);
     String category = _formKey.currentState?.fields['category']?.value ?? '';
-    String date = (_formKey.currentState?.fields['date']?.value as DateTime).toString();
-    int month = (_formKey.currentState?.fields['date']?.value as DateTime).month;
+    String date =
+        (_formKey.currentState?.fields['date']?.value as DateTime).toString();
+    int month =
+        (_formKey.currentState?.fields['date']?.value as DateTime).month;
     int year = (_formKey.currentState?.fields['date']?.value as DateTime).year;
 
     final budgetItem = BudgetItem(
@@ -35,7 +38,8 @@ class _EditRegisterScreenState extends State<EditRegisterScreen> {
         month: month,
         year: year,
         amount: _formKey.currentState?.fields['amount']?.value,
-        isPaidWithCreditCard: _formKey.currentState?.fields['isPaidWithCreditCard']?.value);
+        isPaidWithCreditCard:
+            _formKey.currentState?.fields['isPaidWithCreditCard']?.value);
 
     final budgetItemDao = _database.budgetItemDao;
     try {
@@ -44,12 +48,11 @@ class _EditRegisterScreenState extends State<EditRegisterScreen> {
     } catch (e) {
       print('deu ruim $e');
     }
-
   }
 
   void _openDatabase() async {
     _database =
-    await $FloorAppDatabase.databaseBuilder('app_database.db').build();
+        await $FloorAppDatabase.databaseBuilder('app_database.db').build();
   }
 
   @override
@@ -66,7 +69,8 @@ class _EditRegisterScreenState extends State<EditRegisterScreen> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SingleChildScrollView(child: Padding(
+      body: SingleChildScrollView(
+          child: Padding(
         padding: const EdgeInsets.all(20),
         child: FormBuilder(
             key: _formKey,
@@ -91,7 +95,8 @@ class _EditRegisterScreenState extends State<EditRegisterScreen> {
                   onChanged: (value) {
                     if (value == 'Receita') {
                       _formKey.currentState?.fields['category']?.reset();
-                      _formKey.currentState?.fields['isPaidWithCreditCard']?.reset();
+                      _formKey.currentState?.fields['isPaidWithCreditCard']
+                          ?.reset();
                       setState(() {
                         isExpense = false;
                       });
@@ -137,48 +142,45 @@ class _EditRegisterScreenState extends State<EditRegisterScreen> {
                   },
                 ),
                 FormBuilderTextField(
-                  name: 'description',
-                  decoration: const InputDecoration(labelText: 'Descrição'),
+                    name: 'description',
+                    decoration: const InputDecoration(labelText: 'Descrição'),
                     autovalidateMode: AutovalidateMode.onUserInteraction,
-                  validator: (value) {
-                    if (value == null || value == '') {
-                      return 'Campo obrigatório';
-                    }
-                    return null;
-                  }
-                ),
-                FormBuilderDateTimePicker(
-                  name: 'date',
-                  decoration: const InputDecoration(labelText: 'Data'),
-                  lastDate: DateTime.now(),
-                  format: DateFormat("dd/MM/yyyy"),
-                  locale: const Locale('pt', 'BR'),
-                  inputType: InputType.date,
-                    validator: (value) {
-                      if (value == null) {
-                        return 'Campo obrigatório';
-                      }
-                      return null;
-                    }
-                ),
-                FormBuilderTextField(
-                  name: 'amount',
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(labelText: 'Valor'),
-                  inputFormatters: [
-                    CurrencyTextInputFormatter(
-                      locale: 'pt_BR',
-                      decimalDigits: 2,
-                      symbol: 'R\$',
-                    )
-                  ],
                     validator: (value) {
                       if (value == null || value == '') {
                         return 'Campo obrigatório';
                       }
                       return null;
-                    }
-                ),
+                    }),
+                FormBuilderDateTimePicker(
+                    name: 'date',
+                    decoration: const InputDecoration(labelText: 'Data'),
+                    lastDate: DateTime.now(),
+                    format: DateFormat("dd/MM/yyyy"),
+                    locale: const Locale('pt', 'BR'),
+                    inputType: InputType.date,
+                    validator: (value) {
+                      if (value == null) {
+                        return 'Campo obrigatório';
+                      }
+                      return null;
+                    }),
+                FormBuilderTextField(
+                    name: 'amount',
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(labelText: 'Valor'),
+                    inputFormatters: [
+                      CurrencyTextInputFormatter(
+                        locale: 'pt_BR',
+                        decimalDigits: 2,
+                        symbol: 'R\$',
+                      )
+                    ],
+                    validator: (value) {
+                      if (value == null || value == '') {
+                        return 'Campo obrigatório';
+                      }
+                      return null;
+                    }),
                 FormBuilderCheckbox(
                   // Core attributes
                   name: 'isPaidWithCreditCard',
