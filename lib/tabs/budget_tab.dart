@@ -112,7 +112,9 @@ class _BudgetTabState extends State<BudgetTab> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.pushNamed(context, '/add');
+        },
         tooltip: 'Adicionar registro',
         elevation: 5,
         splashColor: Colors.grey,
