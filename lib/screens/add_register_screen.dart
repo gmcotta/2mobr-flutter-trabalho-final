@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:intl/intl.dart';
-import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:trabalho_final_2mobr/database/app_database.dart';
+import 'package:trabalho_final_2mobr/entities/budget_item.dart';
 
 class AddRegisterScreen extends StatefulWidget {
   const AddRegisterScreen({super.key});
@@ -14,6 +15,40 @@ class AddRegisterScreen extends StatefulWidget {
 class _AddRegisterScreenState extends State<AddRegisterScreen> {
   final _formKey = GlobalKey<FormBuilderState>();
   bool isExpense = false;
+  late AppDatabase _database;
+
+  void _saveBudgetItem() async {
+    String category = _formKey.currentState?.fields['category']?.value ?? '';
+    String date = (_formKey.currentState?.fields['date']?.value as DateTime).toString();
+
+    final budgetItem = BudgetItem(
+        type: _formKey.currentState?.fields['type']?.value,
+        category: category,
+        description: _formKey.currentState?.fields['description']?.value,
+        date: date,
+        amount: _formKey.currentState?.fields['amount']?.value,
+        isPaidWithCreditCard: _formKey.currentState?.fields['isPaidWithCreditCard']?.value);
+
+    final budgetItemDao = _database.budgetItemDao;
+    try {
+      await budgetItemDao.insertBudgetItem(budgetItem);
+      Navigator.of(context).pop();
+    } catch (e) {
+      print('deu ruim $e');
+    }
+
+  }
+
+  void _openDatabase() async {
+    _database =
+    await $FloorAppDatabase.databaseBuilder('app_database.db').build();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _openDatabase();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +72,7 @@ class _AddRegisterScreenState extends State<AddRegisterScreen> {
                   onChanged: (value) {
                     if (value == 'Receita') {
                       _formKey.currentState?.fields['category']?.reset();
-                      _formKey.currentState?.fields['creditCard']?.reset();
+                      _formKey.currentState?.fields['isPaidWithCreditCard']?.reset();
                       setState(() {
                         isExpense = false;
                       });
@@ -127,15 +162,18 @@ class _AddRegisterScreenState extends State<AddRegisterScreen> {
                 ),
                 FormBuilderCheckbox(
                   // Core attributes
-                  name: 'creditCard',
+                  name: 'isPaidWithCreditCard',
                   initialValue: false,
                   title: const Text('Pago com o cartão de crédito?'),
                   enabled: isExpense,
                 ),
                 ElevatedButton(
                     onPressed: () {
-                      _formKey.currentState?.saveAndValidate();
-                      print(_formKey.currentState?.value);
+                      bool? isValid = _formKey.currentState?.saveAndValidate();
+
+                      if (isValid != null && isValid) {
+                        _saveBudgetItem();
+                      }
                     },
                     child: const Text("Enviar"))
               ],

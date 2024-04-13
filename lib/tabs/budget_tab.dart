@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:trabalho_final_2mobr/database/app_database.dart';
+import 'package:trabalho_final_2mobr/entities/budget_item.dart';
+
+import '../dao/budget_item_dao.dart';
 
 get budgetTab => const BudgetTab();
 
@@ -9,31 +14,53 @@ class BudgetTab extends StatefulWidget {
   State<BudgetTab> createState() => _BudgetTabState();
 }
 
-abstract class ListItem {
-  Widget buildTitle(BuildContext context);
-
-  Widget buildSubtitle(BuildContext context);
-}
-
-class MessageItem implements ListItem {
-  final String sender;
-  final String body;
-
-  MessageItem(this.sender, this.body);
-
-  @override
-  Widget buildTitle(BuildContext context) => Text(sender);
-
-  @override
-  Widget buildSubtitle(BuildContext context) => Text(body);
-}
-
 class _BudgetTabState extends State<BudgetTab> {
-  List<ListItem> items = List<ListItem>.generate(
-      5, (index) => MessageItem('Sender $index', 'Message body $index'));
+  late AppDatabase _database;
+  late BudgetItemDao _budgetItemDao;
+  List<BudgetItem> rows = [];
+
+  void _openDatabase() async {
+    _database =
+    await $FloorAppDatabase.databaseBuilder('app_database.db').build();
+    _buildItems();
+  }
+
+  void _buildItems() async {
+    _budgetItemDao = _database.budgetItemDao;
+    List<BudgetItem> itemsFromDB = await _budgetItemDao.findAllBudgetItems();
+
+    setState(() {
+      rows = itemsFromDB;
+    });
+  }
+
+  void _showDeleteDialog(BudgetItem budgetItem) {
+    showDialog(context: context, builder: (BuildContext context) => AlertDialog(
+      title: const Text('Excluir item'),
+      content: const Text('Deseja realmente excluir esse item?'),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context, 'Não'), child: const Text('Não')),
+        TextButton(onPressed: () => _deleteItem(budgetItem), child: const Text('Sim'))
+      ],
+    ));
+  }
+
+  void _deleteItem(BudgetItem budgetItem) async {
+    _budgetItemDao = _database.budgetItemDao;
+
+    try {
+      await _budgetItemDao.deleteBBudgetItem(budgetItem);
+      Navigator.pop(context, 'Sim');
+    } catch (e) {
+      print('deu ruim');
+    }
+    _buildItems();
+  }
 
   @override
   Widget build(BuildContext context) {
+    _openDatabase();
+
     return Scaffold(
       body: Column(
         children: [
@@ -45,69 +72,50 @@ class _BudgetTabState extends State<BudgetTab> {
                 style: Theme.of(context).textTheme.headlineLarge,
               )),
           Expanded(
-              child: ListView(
-            padding:
-                const EdgeInsets.only(left: 12, right: 12, top: 24, bottom: 12),
-            children: <Widget>[
-              ListTile(
-                leading: const Icon(Icons.arrow_upward, color: Colors.green),
-                title: const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Receita'),
-                    Text('Salário'),
-                    Text('01/04/2024'),
-                    Text('R\$ 4500,00')
-                  ],
-                ),
-                trailing: Column(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Expanded(
-                        child: ElevatedButton(
-                            onPressed: () {},
-                            child: const Icon(Icons.edit,
-                                color: Colors.black, size: 20)),
-                      ),
-                      Expanded(
-                          child: ElevatedButton(
-                              onPressed: () {},
-                              child: const Icon(Icons.delete,
-                                  color: Colors.black, size: 20))),
-                    ]),
-              ),
-              ListTile(
-                leading: const Icon(Icons.arrow_downward, color: Colors.red),
-                title: const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Despesa'),
-                    Text('Aluguel'),
-                    Text('03/04/2024'),
-                    Text('R\$ 2000,00')
-                  ],
-                ),
-                trailing: Column(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Expanded(
-                        child: ElevatedButton(
-                            onPressed: () {},
-                            child: const Icon(Icons.edit,
-                                color: Colors.black, size: 20)),
-                      ),
-                      Expanded(
-                          child: ElevatedButton(
-                              onPressed: () {},
-                              child: const Icon(Icons.delete,
-                                  color: Colors.black, size: 20))),
-                    ]),
-              ),
-            ],
+              child: ListView.builder(
+                padding: const EdgeInsets.only(left: 12, right: 12, top: 24, bottom: 12),
+                itemCount: rows.length,
+                itemBuilder: (context, index) {
+                  final typeIcon = rows[index].type == 'Receita'
+                      ? Icons.arrow_upward
+                      : Icons.arrow_downward;
+                  final typeIconColor = rows[index].type == 'Receita' ? Colors.green : Colors.red;
+                  final typeText = rows[index].type == 'Despesa'
+                      ? '${rows[index].type} - ${rows[index].category}'
+                      : rows[index].type;
+                  final formattedDate = DateFormat('dd/MM/yyyy').format(DateTime.parse(rows[index].date));
+                  return ListTile(
+                    leading: Icon(typeIcon, color: typeIconColor),
+                    title: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(typeText),
+                        Text(rows[index].description),
+                        Text(formattedDate),
+                        Text(rows[index].amount)
+                      ],
+                    ),
+                    trailing: Column(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Expanded(
+                            child: ElevatedButton(
+                                onPressed: () {},
+                                child: const Icon(Icons.edit,
+                                    color: Colors.black, size: 20)),
+                          ),
+                          Expanded(
+                              child: ElevatedButton(
+                                  onPressed: () {
+                                    _showDeleteDialog(rows[index]);
+                                  },
+                                  child: const Icon(Icons.delete,
+                                      color: Colors.black, size: 20))),
+                        ]),
+                  );
+                },
           )),
         ],
       ),
