@@ -1,21 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
-import 'package:trabalho_final_2mobr/entities/budget_period.dart';
 
+import 'package:trabalho_final_2mobr/entities/budget_period.dart';
 import 'package:trabalho_final_2mobr/screens/add_register_screen.dart';
 import 'package:trabalho_final_2mobr/screens/home_screen.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(ChangeNotifierProvider(
+      create: (context) => BudgetPeriodModel(), child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -27,9 +25,7 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => ChangeNotifierProvider(
-            create: (context) => BudgetPeriodModel(),
-            child: const HomeScreen()),
+        '/': (context) => const HomeScreen(),
         '/add': (context) => const AddRegisterScreen()
       },
       localizationsDelegates: GlobalMaterialLocalizations.delegates,
