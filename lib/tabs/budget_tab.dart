@@ -98,7 +98,7 @@ class _BudgetTabState extends State<BudgetTab> {
               children: [
                 Consumer<BudgetPeriodModel>(
                   builder: (context, value, child) => Text(
-                    'Período: ${value.month.toString().padLeft(2, '0')}/${value.year}',
+                    'Período: ${addLeadingZeros(value.month.toString(), 1)}/${value.year}',
                     style: const TextStyle(fontSize: 24),
                   ),
                 ),

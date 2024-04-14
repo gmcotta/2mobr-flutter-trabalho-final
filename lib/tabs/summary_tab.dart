@@ -38,11 +38,11 @@ class _SummaryTabState extends State<SummaryTab> {
     try {
       List<BudgetItem>? allIncomes =
       await _budgetItemDao.findBudgetIncomesByPeriod(month, year);
-      double income = _sumListAmount(allIncomes);
+      double income = sumBudgetItemListAmount(allIncomes);
 
       List<BudgetItem>? allExpenses =
       await _budgetItemDao.findBudgetExpensesByPeriod(month, year);
-      double expense = _sumListAmount(allExpenses);
+      double expense = sumBudgetItemListAmount(allExpenses);
 
       setState(() {
         totalIncomes = convertDoubleToCurrency(income);
@@ -61,7 +61,7 @@ class _SummaryTabState extends State<SummaryTab> {
         allExpenses.where((element) => element.isPaidWithCreditCard).toList();
         expensesPaidWithCreditCard.sort((a, b) => a.date.compareTo(b.date));
         double totalAmountExpensesCreditCard =
-        _sumListAmount(expensesPaidWithCreditCard);
+        sumBudgetItemListAmount(expensesPaidWithCreditCard);
 
         setState(() {
           highestExpense =
@@ -77,15 +77,6 @@ class _SummaryTabState extends State<SummaryTab> {
     }
   }
 
-  double _sumListAmount(List<BudgetItem>? items) {
-    if (items == null || items.isEmpty) {
-      return 0;
-    }
-    Iterable<double> itemsAmount =
-        items.map((e) => convertCurrencyToDouble(e.amount));
-    double amountSum = itemsAmount.reduce((value, element) => value + element);
-    return amountSum;
-  }
 
   @override
   void initState() {
@@ -108,7 +99,7 @@ class _SummaryTabState extends State<SummaryTab> {
                   left: 12, right: 12, top: 24, bottom: 12),
               child: Consumer<BudgetPeriodModel>(
                 builder: (context, value, child) => Text(
-                  "Resumo: ${value.month.toString().padLeft(2, '0')}/${value.year}",
+                  "Resumo: ${addLeadingZeros(value.month.toString(), 1)}/${value.year}",
                   style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 32),
                 ),
               )),
