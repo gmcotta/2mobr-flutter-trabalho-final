@@ -1,12 +1,11 @@
-import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import 'package:trabalho_final_2mobr/dao/budget_item_dao.dart';
 import 'package:trabalho_final_2mobr/database/app_database.dart';
 import 'package:trabalho_final_2mobr/entities/budget_item.dart';
 import 'package:trabalho_final_2mobr/entities/budget_period.dart';
+import 'package:trabalho_final_2mobr/utils/functions.dart';
 
 get summaryTab => const SummaryTab();
 
@@ -80,22 +79,6 @@ class _SummaryTabState extends State<SummaryTab> {
         items.map((e) => convertCurrencyToDouble(e.amount));
     double amountSum = itemsAmount.reduce((value, element) => value + element);
     return amountSum;
-  }
-
-  String convertDoubleToCurrency(double amount) {
-    final CurrencyTextInputFormatter formatter = CurrencyTextInputFormatter(
-        locale: 'pt_BR',
-        decimalDigits: 2,
-        symbol: 'R\$',
-        turnOffGrouping: true);
-
-    return formatter.formatDouble(amount);
-  }
-
-  double convertCurrencyToDouble(String currency) {
-    String amount = currency.replaceAllMapped(RegExp(r'R\$\s(\d+)\,(\d+)'),
-        (Match m) => '${m[1].toString()}.${m[2].toString()}');
-    return double.parse(amount);
   }
 
   @override
@@ -179,8 +162,7 @@ class _SummaryTabState extends State<SummaryTab> {
                             shrinkWrap: true,
                             itemBuilder: (context, index) {
                               final item = creditCardExpenses[index];
-                              final formattedDate = DateFormat('dd/MM/yyyy')
-                                  .format(DateTime.parse(item.date));
+                              final formattedDate = formatDate(item.date);
                               return ListTile(
                                 leading: const Icon(Icons.check),
                                 title: Text(

@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import 'package:trabalho_final_2mobr/dao/budget_item_dao.dart';
@@ -9,6 +8,7 @@ import 'package:trabalho_final_2mobr/database/app_database.dart';
 import 'package:trabalho_final_2mobr/entities/budget_item.dart';
 import 'package:trabalho_final_2mobr/entities/budget_period.dart';
 import 'package:trabalho_final_2mobr/screens/edit_register_screen.dart';
+import 'package:trabalho_final_2mobr/utils/functions.dart';
 
 get budgetTab => const BudgetTab();
 
@@ -228,14 +228,9 @@ class _BudgetTabState extends State<BudgetTab> {
                     final typeText = rows[index].type == 'Despesa'
                         ? '${rows[index].type} - ${rows[index].category}'
                         : rows[index].type;
-                    final formattedDate = DateFormat('dd/MM/yyyy')
-                        .format(DateTime.parse(rows[index].date));
+                    final formattedDate = formatDate(rows[index].date);
 
                     return ListTile(
-                      // shape: RoundedRectangleBorder(
-                      //   side: const BorderSide(color: Colors.black, width: 1),
-                      //   borderRadius: BorderRadius.circular(5),
-                      // ),
                       leading: Icon(typeIcon, color: typeIconColor),
                       title: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
