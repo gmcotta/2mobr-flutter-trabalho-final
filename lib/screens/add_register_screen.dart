@@ -5,6 +5,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:intl/intl.dart';
 
 import 'package:trabalho_final_2mobr/database/app_database.dart';
+import 'package:trabalho_final_2mobr/dialogs/generic_error_dialog.dart';
 import 'package:trabalho_final_2mobr/entities/budget_item.dart';
 
 class AddRegisterScreen extends StatefulWidget {
@@ -44,9 +45,7 @@ class _AddRegisterScreenState extends State<AddRegisterScreen> {
       if (!mounted) return;
       Navigator.of(context).pop();
     } catch (e) {
-      if (kDebugMode) {
-        print('deu ruim $e');
-      }
+      showDialog(context: context, builder: (BuildContext context) => const GenericErrorDialog());
     }
   }
 

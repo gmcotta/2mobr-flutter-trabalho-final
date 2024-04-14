@@ -1,11 +1,11 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:trabalho_final_2mobr/dao/budget_item_dao.dart';
 import 'package:trabalho_final_2mobr/database/app_database.dart';
-import 'package:trabalho_final_2mobr/dialogs/delete_budget_item.dart';
-import 'package:trabalho_final_2mobr/dialogs/filter_period.dart';
+import 'package:trabalho_final_2mobr/dialogs/delete_budget_item_dialog.dart';
+import 'package:trabalho_final_2mobr/dialogs/filter_period_dialog.dart';
+import 'package:trabalho_final_2mobr/dialogs/generic_error_dialog.dart';
 import 'package:trabalho_final_2mobr/entities/budget_item.dart';
 import 'package:trabalho_final_2mobr/entities/budget_period.dart';
 import 'package:trabalho_final_2mobr/screens/edit_register_screen.dart';
@@ -56,9 +56,7 @@ class _BudgetTabState extends State<BudgetTab> {
       if (!mounted) return;
       Navigator.pop(context, 'Sim');
     } catch (e) {
-      if (kDebugMode) {
-        print('deu ruim');
-      }
+      showDialog(context: context, builder: (BuildContext context) => const GenericErrorDialog());
     }
     if (!mounted) return;
     int month = Provider.of<BudgetPeriodModel>(context, listen: false).month;

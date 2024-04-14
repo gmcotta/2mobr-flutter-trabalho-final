@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import 'package:trabalho_final_2mobr/dao/budget_item_dao.dart';
 import 'package:trabalho_final_2mobr/database/app_database.dart';
+import 'package:trabalho_final_2mobr/dialogs/generic_error_dialog.dart';
 import 'package:trabalho_final_2mobr/entities/budget_item.dart';
 import 'package:trabalho_final_2mobr/entities/budget_period.dart';
 import 'package:trabalho_final_2mobr/utils/functions.dart';
@@ -34,40 +35,45 @@ class _SummaryTabState extends State<SummaryTab> {
     int year = Provider.of<BudgetPeriodModel>(context, listen: false).year;
     _budgetItemDao = _database.budgetItemDao;
 
-    List<BudgetItem>? allIncomes =
-        await _budgetItemDao.findBudgetIncomesByPeriod(month, year);
-    double income = _sumListAmount(allIncomes);
+    try {
+      List<BudgetItem>? allIncomes =
+      await _budgetItemDao.findBudgetIncomesByPeriod(month, year);
+      double income = _sumListAmount(allIncomes);
 
-    List<BudgetItem>? allExpenses =
-        await _budgetItemDao.findBudgetExpensesByPeriod(month, year);
-    double expense = _sumListAmount(allExpenses);
-
-    setState(() {
-      totalIncomes = convertDoubleToCurrency(income);
-      totalExpenses = convertDoubleToCurrency(expense);
-      balance = convertDoubleToCurrency(income - expense);
-    });
-
-    if (allExpenses != null && allExpenses.isNotEmpty) {
-      BudgetItem biggestExpense = allExpenses.reduce((value, element) =>
-          convertCurrencyToDouble(value.amount) >
-                  convertCurrencyToDouble(element.amount)
-              ? value
-              : element);
-
-      List<BudgetItem> expensesPaidWithCreditCard =
-          allExpenses.where((element) => element.isPaidWithCreditCard).toList();
-      expensesPaidWithCreditCard.sort((a, b) => a.date.compareTo(b.date));
-      double totalAmountExpensesCreditCard =
-          _sumListAmount(expensesPaidWithCreditCard);
+      List<BudgetItem>? allExpenses =
+      await _budgetItemDao.findBudgetExpensesByPeriod(month, year);
+      double expense = _sumListAmount(allExpenses);
 
       setState(() {
-        highestExpense =
-            '${biggestExpense.description} - ${biggestExpense.amount}';
-        creditCardExpenses = expensesPaidWithCreditCard;
-        totalCreditCardExpenses =
-            convertDoubleToCurrency(totalAmountExpensesCreditCard);
+        totalIncomes = convertDoubleToCurrency(income);
+        totalExpenses = convertDoubleToCurrency(expense);
+        balance = convertDoubleToCurrency(income - expense);
       });
+
+      if (allExpenses != null && allExpenses.isNotEmpty) {
+        BudgetItem biggestExpense = allExpenses.reduce((value, element) =>
+        convertCurrencyToDouble(value.amount) >
+            convertCurrencyToDouble(element.amount)
+            ? value
+            : element);
+
+        List<BudgetItem> expensesPaidWithCreditCard =
+        allExpenses.where((element) => element.isPaidWithCreditCard).toList();
+        expensesPaidWithCreditCard.sort((a, b) => a.date.compareTo(b.date));
+        double totalAmountExpensesCreditCard =
+        _sumListAmount(expensesPaidWithCreditCard);
+
+        setState(() {
+          highestExpense =
+          '${biggestExpense.description} - ${biggestExpense.amount}';
+          creditCardExpenses = expensesPaidWithCreditCard;
+          totalCreditCardExpenses =
+              convertDoubleToCurrency(totalAmountExpensesCreditCard);
+        });
+      }
+    } catch (e) {
+      if (!mounted) return;
+      showDialog(context: context, builder: (BuildContext context) => const GenericErrorDialog());
     }
   }
 
