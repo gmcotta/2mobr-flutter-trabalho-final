@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import 'package:trabalho_final_2mobr/dao/budget_item_dao.dart';
 import 'package:trabalho_final_2mobr/database/app_database.dart';
+import 'package:trabalho_final_2mobr/dialogs/delete_budget_item.dart';
 import 'package:trabalho_final_2mobr/dialogs/filter_period.dart';
 import 'package:trabalho_final_2mobr/entities/budget_item.dart';
 import 'package:trabalho_final_2mobr/entities/budget_period.dart';
@@ -47,23 +48,6 @@ class _BudgetTabState extends State<BudgetTab> {
     });
   }
 
-  void _showDeleteDialog(BudgetItem budgetItem) {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) => AlertDialog(
-              title: const Text('Excluir item'),
-              content: Text('Deseja realmente excluir o item ${budgetItem.type} - ${budgetItem.description}?'),
-              actions: [
-                TextButton(
-                    onPressed: () => Navigator.pop(context, 'Não'),
-                    child: const Text('Não')),
-                TextButton(
-                    onPressed: () => _deleteItem(budgetItem),
-                    child: const Text('Sim'))
-              ],
-            ));
-  }
-
   void _deleteItem(BudgetItem budgetItem) async {
     _budgetItemDao = _database.budgetItemDao;
 
@@ -80,6 +64,12 @@ class _BudgetTabState extends State<BudgetTab> {
     int month = Provider.of<BudgetPeriodModel>(context, listen: false).month;
     int year = Provider.of<BudgetPeriodModel>(context, listen: false).year;
     _buildItems(month, year);
+  }
+
+  void _showDeleteDialog(BudgetItem budgetItem) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) => DeleteBudgetItemDialog(budgetItem: budgetItem,deleteItem: _deleteItem));
   }
 
   @override
