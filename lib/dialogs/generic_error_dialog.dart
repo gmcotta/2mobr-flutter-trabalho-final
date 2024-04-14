@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:trabalho_final_2mobr/entities/budget_item.dart';
 
 class GenericErrorDialog extends AlertDialog {
   const GenericErrorDialog({super.key});
