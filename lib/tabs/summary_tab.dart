@@ -163,6 +163,7 @@ class _SummaryTabState extends State<SummaryTab> {
                       mainAxisSize: MainAxisSize.max,
                       children: [
                         ListView.builder(
+                            physics: const NeverScrollableScrollPhysics(),
                             itemCount: creditCardExpenses.length,
                             scrollDirection: Axis.vertical,
                             shrinkWrap: true,
