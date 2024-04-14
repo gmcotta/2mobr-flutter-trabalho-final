@@ -213,6 +213,28 @@ class _$BudgetItemDao extends BudgetItemDao {
   }
 
   @override
+  Future<List<BudgetItem>?> findBudgetIncomesByPeriod(
+    int month,
+    int year,
+  ) async {
+    return _queryAdapter.queryList(
+        'SELECT * FROM BudgetItem WHERE type = \"Receita\" AND month = ?1 AND year = ?2',
+        mapper: (Map<String, Object?> row) => BudgetItem(id: row['id'] as int?, type: row['type'] as String, category: row['category'] as String?, description: row['description'] as String, date: row['date'] as String, month: row['month'] as int, year: row['year'] as int, amount: row['amount'] as String, isPaidWithCreditCard: (row['isPaidWithCreditCard'] as int) != 0),
+        arguments: [month, year]);
+  }
+
+  @override
+  Future<List<BudgetItem>?> findBudgetExpensesByPeriod(
+    int month,
+    int year,
+  ) async {
+    return _queryAdapter.queryList(
+        'SELECT * FROM BudgetItem WHERE type = \"Despesa\" AND month = ?1 AND year = ?2',
+        mapper: (Map<String, Object?> row) => BudgetItem(id: row['id'] as int?, type: row['type'] as String, category: row['category'] as String?, description: row['description'] as String, date: row['date'] as String, month: row['month'] as int, year: row['year'] as int, amount: row['amount'] as String, isPaidWithCreditCard: (row['isPaidWithCreditCard'] as int) != 0),
+        arguments: [month, year]);
+  }
+
+  @override
   Future<void> insertBudgetItem(BudgetItem budgetItem) async {
     await _budgetItemInsertionAdapter.insert(
         budgetItem, OnConflictStrategy.abort);

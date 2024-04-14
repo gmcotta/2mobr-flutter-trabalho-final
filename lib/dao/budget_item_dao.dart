@@ -13,6 +13,12 @@ abstract class BudgetItemDao {
   @Query('SELECT * FROM BudgetItem WHERE month = :month AND year = :year')
   Future<List<BudgetItem>?> findBudgetItemsByPeriod(int month, int year);
 
+  @Query('SELECT * FROM BudgetItem WHERE type = "Receita" AND month = :month AND year = :year')
+  Future<List<BudgetItem>?> findBudgetIncomesByPeriod(int month, int year);
+
+  @Query('SELECT * FROM BudgetItem WHERE type = "Despesa" AND month = :month AND year = :year')
+  Future<List<BudgetItem>?> findBudgetExpensesByPeriod(int month, int year);
+
   @insert
   Future<void> insertBudgetItem(BudgetItem budgetItem);
 

@@ -1,12 +1,14 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
+import 'package:trabalho_final_2mobr/dao/budget_item_dao.dart';
 import 'package:trabalho_final_2mobr/database/app_database.dart';
 import 'package:trabalho_final_2mobr/entities/budget_item.dart';
+import 'package:trabalho_final_2mobr/entities/budget_period.dart';
 import 'package:trabalho_final_2mobr/screens/edit_register_screen.dart';
-import 'package:trabalho_final_2mobr/dao/budget_item_dao.dart';
 
 get budgetTab => const BudgetTab();
 
@@ -22,19 +24,21 @@ class _BudgetTabState extends State<BudgetTab> {
   late BudgetItemDao _budgetItemDao;
   late SimpleDialog dialog;
   List<BudgetItem> rows = [];
-  int currentMonth = DateTime.now().month;
-  int currentYear = DateTime.now().year;
   final _formKey = GlobalKey<FormBuilderState>();
 
   void _openDatabase() async {
     _database =
         await $FloorAppDatabase.databaseBuilder('app_database.db').build();
-    _buildItems(currentMonth, currentYear);
+    if (!mounted) return;
+    int month = Provider.of<BudgetPeriodModel>(context, listen: false).month;
+    int year = Provider.of<BudgetPeriodModel>(context, listen: false).year;
+    _buildItems(month, year);
   }
 
-  void _buildItems(int currentMonth, int currentYear) async {
+  void _buildItems(int month, int year) async {
     _budgetItemDao = _database.budgetItemDao;
-    List<BudgetItem>? itemsFromDB = await _budgetItemDao.findBudgetItemsByPeriod(currentMonth, currentYear);
+    List<BudgetItem>? itemsFromDB =
+        await _budgetItemDao.findBudgetItemsByPeriod(month, year);
     if (itemsFromDB != null) {
       itemsFromDB.sort((a, b) => a.date.compareTo(b.date));
     }
@@ -49,7 +53,7 @@ class _BudgetTabState extends State<BudgetTab> {
         context: context,
         builder: (BuildContext context) => AlertDialog(
               title: const Text('Excluir item'),
-              content: const Text('Deseja realmente excluir esse item?'),
+              content: Text('Deseja realmente excluir o item ${budgetItem.type} - ${budgetItem.description}?'),
               actions: [
                 TextButton(
                     onPressed: () => Navigator.pop(context, 'Não'),
@@ -66,11 +70,17 @@ class _BudgetTabState extends State<BudgetTab> {
 
     try {
       await _budgetItemDao.deleteBBudgetItem(budgetItem);
+      if (!mounted) return;
       Navigator.pop(context, 'Sim');
     } catch (e) {
-      print('deu ruim');
+      if (kDebugMode) {
+        print('deu ruim');
+      }
     }
-    _buildItems(currentMonth, currentYear);
+    if (!mounted) return;
+    int month = Provider.of<BudgetPeriodModel>(context, listen: false).month;
+    int year = Provider.of<BudgetPeriodModel>(context, listen: false).year;
+    _buildItems(month, year);
   }
 
   @override
@@ -130,19 +140,28 @@ class _BudgetTabState extends State<BudgetTab> {
                           }),
                       ElevatedButton(
                           onPressed: () {
-                            bool? isValid = _formKey.currentState?.saveAndValidate();
+                            bool? isValid =
+                                _formKey.currentState?.saveAndValidate();
 
                             if (isValid != null && isValid) {
-                              int month = int.parse((_formKey.currentState?.fields['month']?.value as String));
-                              int year = int.parse((_formKey.currentState?.fields['year']?.value as String));
+                              int month = int.parse((_formKey.currentState
+                                  ?.fields['month']?.value as String));
+                              int year = int.parse((_formKey.currentState
+                                  ?.fields['year']?.value as String));
+
+                              DateTime chosenPeriod = DateTime(year, month);
+
+                              if (chosenPeriod.compareTo(DateTime.now()) > 0) {
+                                _formKey.currentState?.fields['month']?.invalidate(
+                                    'Digite o período igual ou menor ao atual');
+                                return;
+                              }
 
                               _buildItems(month, year);
 
-                              setState(() {
-                                currentMonth = month;
-                                currentYear = year;
-                              });
-
+                              Provider.of<BudgetPeriodModel>(context,
+                                      listen: false)
+                                  .changePeriod(month, year);
                               Navigator.pop(context);
                             }
                           },
@@ -163,31 +182,39 @@ class _BudgetTabState extends State<BudgetTab> {
     return Scaffold(
       body: Column(
         children: [
-          Padding(
-              padding: const EdgeInsets.only(
+          const Padding(
+              padding: EdgeInsets.only(
                   left: 12, right: 12, top: 24, bottom: 12),
               child: Text(
                 "Orçamento",
-                style: Theme.of(context).textTheme.headlineLarge,
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 32),
               )),
           Padding(
             padding: const EdgeInsets.all(12),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Período: $currentMonth/$currentYear'),
+                Consumer<BudgetPeriodModel>(
+                  builder: (context, value, child) => Text(
+                    'Período: ${value.month.toString().padLeft(2, '0')}/${value.year}',
+                    style: const TextStyle(fontSize: 24),
+                  ),
+                ),
                 ElevatedButton(
                     onPressed: () {
-                      showDialog<void>(context: context, builder: (context) => dialog);
+                      showDialog<void>(
+                          context: context, builder: (context) => dialog);
                     },
-                    child: const Icon(Icons.filter_alt)
-                )
+                    child: const Icon(Icons.filter_alt))
               ],
             ),
           ),
           rows.isNotEmpty
               ? Expanded(
-                  child: ListView.builder(
+                  child: ListView.separated(
+                  separatorBuilder: (BuildContext context, int index) {
+                    return const SizedBox(height: 12);
+                  },
                   padding: const EdgeInsets.only(
                       left: 12, right: 12, top: 24, bottom: 12),
                   itemCount: rows.length,
@@ -205,30 +232,30 @@ class _BudgetTabState extends State<BudgetTab> {
                         .format(DateTime.parse(rows[index].date));
 
                     return ListTile(
+                      // shape: RoundedRectangleBorder(
+                      //   side: const BorderSide(color: Colors.black, width: 1),
+                      //   borderRadius: BorderRadius.circular(5),
+                      // ),
                       leading: Icon(typeIcon, color: typeIconColor),
                       title: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(typeText),
+                          Text(typeText,
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold)),
                           Text(rows[index].description),
-                          Text(formattedDate),
                           Row(
                             children: [
-                              Text(rows[index].amount),
+                              Text('$formattedDate - ${rows[index].amount}'),
+                              const SizedBox(width: 8,),
                               rows[index].isPaidWithCreditCard
-                                  ? const Icon(Icons.credit_card)
+                                  ? const Icon(Icons.credit_card, color: Colors.blue,)
                                   : const Text(""),
                             ],
-                          )
-                        ],
-                      ),
-                      trailing: Column(
-                          mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Expanded(
-                              child: ElevatedButton(
+                          ),
+                          Row(
+                            children: [
+                              ElevatedButton(
                                   onPressed: () {
                                     Navigator.push(
                                         context,
@@ -237,27 +264,32 @@ class _BudgetTabState extends State<BudgetTab> {
                                                 EditRegisterScreen(
                                                     budgetItem: rows[index])));
                                   },
-                                  child: const Icon(Icons.edit,
-                                      color: Colors.black, size: 20)),
-                            ),
-                            Expanded(
-                                child: ElevatedButton(
-                                    onPressed: () {
-                                      _showDeleteDialog(rows[index]);
-                                    },
-                                    child: const Icon(Icons.delete,
-                                        color: Colors.black, size: 20))),
-                          ]),
+                                  child: const Icon(Icons.edit, size: 20)),
+                              const SizedBox(
+                                width: 60,
+                              ),
+                              ElevatedButton(
+                                  onPressed: () {
+                                    _showDeleteDialog(rows[index]);
+                                  },
+                                  child: const Icon(Icons.delete, size: 20))
+                            ],
+                          )
+                        ],
+                      ),
                     );
                   },
                 ))
               : const Padding(
                   padding: EdgeInsets.all(12),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Sem itens para o mês selecionado.'),
-                      Text(
-                          'Adicione uma receita ou despesa clicando no ícone de mais no canto inferior direito.')
+                      Text('Sem itens para o mês selecionado...'),
+                      Padding(
+                          padding: EdgeInsets.only(top: 8),
+                          child: Text(
+                              'Adicione uma receita ou despesa clicando no ícone de mais no canto inferior direito.'))
                     ],
                   )),
         ],

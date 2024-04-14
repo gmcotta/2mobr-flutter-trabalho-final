@@ -1,4 +1,5 @@
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:intl/intl.dart';
@@ -40,9 +41,12 @@ class _AddRegisterScreenState extends State<AddRegisterScreen> {
     final budgetItemDao = _database.budgetItemDao;
     try {
       await budgetItemDao.insertBudgetItem(budgetItem);
+      if (!mounted) return;
       Navigator.of(context).pop();
     } catch (e) {
-      print('deu ruim $e');
+      if (kDebugMode) {
+        print('deu ruim $e');
+      }
     }
   }
 
@@ -158,6 +162,7 @@ class _AddRegisterScreenState extends State<AddRegisterScreen> {
                         locale: 'pt_BR',
                         decimalDigits: 2,
                         symbol: 'R\$',
+                        turnOffGrouping: true
                       )
                     ],
                     validator: (value) {
