@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:trabalho_final_2mobr/database/app_database.dart';
 import 'package:trabalho_final_2mobr/dialogs/generic_error_dialog.dart';
 import 'package:trabalho_final_2mobr/entities/budget_item.dart';
+import 'package:trabalho_final_2mobr/utils/categories.dart';
 
 class EditRegisterScreen extends StatefulWidget {
   final BudgetItem budgetItem;
@@ -51,7 +52,9 @@ class _EditRegisterScreenState extends State<EditRegisterScreen> {
       if (!mounted) return;
       Navigator.of(context).pop();
     } catch (e) {
-      showDialog(context: context, builder: (BuildContext context) => const GenericErrorDialog());
+      showDialog(
+          context: context,
+          builder: (BuildContext context) => const GenericErrorDialog());
     }
   }
 
@@ -122,20 +125,10 @@ class _EditRegisterScreenState extends State<EditRegisterScreen> {
                   name: 'category',
                   decoration: const InputDecoration(labelText: 'Categoria'),
                   autovalidateMode: AutovalidateMode.onUserInteraction,
-                  items: [
-                    'Alimentação',
-                    'Moradia',
-                    'Educação',
-                    'Pets',
-                    'Saúde',
-                    'Transporte',
-                    'Pessoais',
-                    'Lazer',
-                    'Outros'
-                  ]
-                      .map((gender) => DropdownMenuItem(
-                            value: gender,
-                            child: Text(gender),
+                  items: categories
+                      .map((category) => DropdownMenuItem(
+                            value: category,
+                            child: Text(category),
                           ))
                       .toList(),
                   enabled: isExpense,
@@ -175,11 +168,10 @@ class _EditRegisterScreenState extends State<EditRegisterScreen> {
                     decoration: const InputDecoration(labelText: 'Valor'),
                     inputFormatters: [
                       CurrencyTextInputFormatter(
-                        locale: 'pt_BR',
-                        decimalDigits: 2,
-                        symbol: 'R\$',
-                        turnOffGrouping: true
-                      )
+                          locale: 'pt_BR',
+                          decimalDigits: 2,
+                          symbol: 'R\$',
+                          turnOffGrouping: true)
                     ],
                     validator: (value) {
                       if (value == null || value == '') {
